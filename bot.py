@@ -7,6 +7,8 @@ import pytz
 import json
 import os
 import time
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 # Configuration
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "TON_TOKEN_ICI")  # Lit depuis variables d'environnement
@@ -197,4 +199,22 @@ def main():
 
 
 if __name__ == '__main__':
+
     main()
+
+
+
+PORT = int(os.environ.get("PORT", 10000))
+
+class SimpleHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Bot is running")
+
+def run_server():
+    server = HTTPServer(("", PORT), SimpleHandler)
+    server.serve_forever()
+
+# Start tiny web server in background
+threading.Thread(target=run_server).start()
